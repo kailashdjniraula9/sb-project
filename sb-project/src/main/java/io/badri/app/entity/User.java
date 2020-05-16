@@ -9,8 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 
-import org.hibernate.validator.constraints.UniqueElements;
-
 @Entity
 @Table(name = "users") // user
 public class User {
@@ -32,19 +30,7 @@ public class User {
 
 	private String password;
 
-	public User() {
-
-	}
-
-	public User(String firstName, String lastName, Date dob, String email, String username, String password) {
-
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.dob = dob;
-		this.email = email;
-		this.username = username;
-		this.password = password;
-	}
+	private boolean enabled = false;
 
 	public int getId() {
 		return id;
@@ -102,9 +88,35 @@ public class User {
 		this.password = password;
 	}
 
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public User() {
+
+	}
+
+	public User(int id, String firstName, String lastName, Date dob, @Email String email, String username,
+			String password, boolean enabled) {
+		super();
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.dob = dob;
+		this.email = email;
+		this.username = username;
+		this.password = password;
+		this.enabled = enabled;
+	}
+
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", dob=" + dob + ", email="
-				+ email + ", username=" + username + ", password=" + password + "]";
+				+ email + ", username=" + username + ", password=" + password + ", enabled=" + enabled + "]";
 	}
+
 }

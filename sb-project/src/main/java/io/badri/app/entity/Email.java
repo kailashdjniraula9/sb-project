@@ -19,13 +19,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class Email {
 	public void sendEmail() {
-		String to = "badri@ncit.edu.np"; // to address. It can be any like gmail, yahoo etc.
-		String from = "kailashdjniraula9@gmail.com"; // from address. As this is using Gmail SMTP your from address
-														// should be
-		String password = "Password#123"; // password for from gmail address that you have used in above line.
-
+                 //just change the from and password, nothing else
+		// to address. It can be any like gmail, yahoo etc
+		String from = "kailashdjtest@gmail.com"; 
+		
+		// from address. As this is using Gmail SMTP your from address
+		String to = "kailashdjniraula9@gmail.com"; 
+		
+		//password for from gmail address that you have used in above line.
+		String password = "RandomPassword#123";
+		
 		Properties prop = new Properties();
+		
 		prop.put("mail.smtp.host", "smtp.gmail.com");
+		//prop.put("mail.smtp.host", "smtp.googlemail.com");
+		
 		prop.put("mail.smtp.port", "465");
 		prop.put("mail.smtp.auth", "true");
 		prop.put("mail.smtp.socketFactory.port", "465");
@@ -53,7 +61,7 @@ public class Email {
 
 			// Attachment body part.
 			MimeBodyPart attachment = new MimeBodyPart();
-			attachment.attachFile("D:\\Wallpapers\\383271.jpg");
+			attachment.attachFile("D:\\Wallpapers\\Pokhara Rara.jpg");
 
 			// Attach body parts
 			emailContent.addBodyPart(textBodyPart);
