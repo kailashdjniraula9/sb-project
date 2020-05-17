@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import io.badri.app.entity.Mail;
@@ -19,7 +20,8 @@ public class MailServiceImpl implements MailService {
 	private JavaMailSender javaMailSender;
 
 	@Override
-	public void sendMail(Mail mail,String Token) throws MessagingException {
+	@Async
+	public void sendMail(Mail mail, String Token) throws MessagingException {
 
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -28,15 +30,14 @@ public class MailServiceImpl implements MailService {
 			mimeMessageHelper.setText(mail.getMailContent());
 			mimeMessageHelper.setFrom(mail.getMailFrom());
 			mimeMessageHelper.setTo(mail.getMailTo());
-			
 
 			String name = mail.getMailTo().split("@")[0];
 
 			mimeMessage.setContent("<html>" + "<head>" + "<h1>Hello&nbsp;" + name + "</h1>" + "</head>" + "<body>"
-					+ "<p>" + "Please click the button below" + "or use the following url to activate account."  + "</p>"
-					+  "<a href='http://localhost:8080/users/emailverification/"+ Token +"'" +">"+ "Activate </a>"  + "<p>" + "With Regards" + "<br>"
-					+ "Hamro Spring boot." + "</p>" + "</body>" + "</html>" + mail.getMailTo(), "text/html");
-
+					+ "<p>" + "Please click the button below" + "or use the following url to activate account." + "</p>"
+					+ "<a href='http://localhost:8080/users/emailverification/" + Token + "'" + ">" + "Activate </a>"
+					+ "<p>" + "With Regards" + "<br>" + "Hamro Spring boot." + "</p>" + "</body>" + "</html>"
+					+ mail.getMailTo(), "text/html");
 
 			javaMailSender.send(mimeMessage);
 		} catch (MessagingException e) {
@@ -68,7 +69,5 @@ public class MailServiceImpl implements MailService {
 		}
 
 	}
-
-	
 
 }

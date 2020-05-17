@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
 			Mail mail = new Mail();
 			mail.setMailFrom("kailasdjtest@gmail.com");
-			mail.setMailTo("kailashdjniraula9@gmail.com");
+			mail.setMailTo(user.getEmail());
 			mail.setMailSubject("Spring Boot - Email Service");
 			mail.setMailContent("Learn how to send email using Spring Boot!");
 			try {
@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public boolean updateUser(User user, int id) {
-		
+
 		if (user != null) {
 			user.setId(id);
 			userRepo.save(user);
@@ -108,10 +108,14 @@ public class UserServiceImpl implements UserService {
 		String email = user.getEmail();
 		String password = user.getPassword();
 
-		if ((userRepo.findByUsername(uname) != null && userRepo.findByPassword(password) != null)
-				|| (userRepo.findByPassword(password) != null && userRepo.findByEmail(email) != null)) {
+		if (userRepo.findByUsername(uname).isEnabled()) {
 
-			return true;
+			if ((userRepo.findByUsername(uname) != null && userRepo.findByPassword(password) != null)
+					|| (userRepo.findByPassword(password) != null && userRepo.findByEmail(email) != null)) {
+
+				return true;
+			}
+
 		}
 
 		return false;
