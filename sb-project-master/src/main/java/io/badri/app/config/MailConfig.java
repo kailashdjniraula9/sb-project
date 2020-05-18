@@ -17,6 +17,7 @@ public class MailConfig {
 	private Environment env;
 	
 	@Value ("${spring.mail.host}")
+	
 	private String host;
 	
 	@Bean

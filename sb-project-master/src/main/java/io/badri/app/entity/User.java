@@ -29,8 +29,23 @@ public class User {
 	private String username;
 
 	private String password;
-
+	
 	private boolean enabled = false;
+
+	public User() {
+
+	}
+
+	public User(String firstName, String lastName, Date dob, String email, String username, String password, boolean isEnabled) {
+
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.dob = dob;
+		this.email = email;
+		this.username = username;
+		this.password = password;
+		this.enabled = isEnabled;
+	}
 
 	public int getId() {
 		return id;
@@ -87,7 +102,7 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
+	
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -96,27 +111,10 @@ public class User {
 		this.enabled = enabled;
 	}
 
-	public User() {
-
-	}
-
-	public User(int id, String firstName, String lastName, Date dob, @Email String email, String username,
-			String password, boolean enabled) {
-		super();
-		this.id = id;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.dob = dob;
-		this.email = email;
-		this.username = username;
-		this.password = password;
-		this.enabled = enabled;
-	}
-
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", dob=" + dob + ", email="
 				+ email + ", username=" + username + ", password=" + password + ", enabled=" + enabled + "]";
 	}
-
+	
 }

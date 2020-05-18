@@ -12,18 +12,18 @@ import io.badri.app.service.UserService;
 
 @RestController
 @RequestMapping("/users")
-public class UserSignUpController {
+public class UserSignupController {
 
 	private UserService userService;
 
 	@Autowired
-	public UserSignUpController(UserService userService) {
+	public UserSignupController(UserService userService) {
 	
 		this.userService = userService;
 	}
 	
-	@PostMapping("/signup")  // /users/signup
-	public void userSignUp(@RequestBody User user) {
+	@PostMapping("/signup") 
+	public void userSignin(@RequestBody User user) {
 		userService.saveUser(user);
 	}
 	
@@ -31,7 +31,8 @@ public class UserSignUpController {
 	public String accountVerfication(@PathVariable String token) {
 		
 		userService.verifyAccount(token);
+	
 		return "Account has been activated successfully ";
+	
 	}
-
 }

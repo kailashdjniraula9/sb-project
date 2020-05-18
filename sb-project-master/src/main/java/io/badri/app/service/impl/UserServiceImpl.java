@@ -1,11 +1,9 @@
 package io.badri.app.service.impl;
 
-import java.time.Instant;
+import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +14,11 @@ import io.badri.app.entity.User;
 import io.badri.app.entity.VerificationToken;
 import io.badri.app.repository.UserRepository;
 import io.badri.app.repository.VerificationTokenRepository;
+import io.badri.app.service.MailService;
 import io.badri.app.service.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {
-
-	@Autowired
-	private VerificationTokenRepository verificationTokenRepository;
-	@Autowired
-	private MailServiceImpl mailService;
 
 	private UserRepository userRepo;
 
@@ -33,44 +27,40 @@ public class UserServiceImpl implements UserService {
 		this.userRepo = userRepo;
 	}
 
+	@Autowired
+	private MailService mailService;
+
+	@Autowired
+	private VerificationTokenRepository verificationTokenRepository;
+
 	@Override
 	public void saveUser(User user) {
 
 		User usrWithEmail = userRepo.findByEmail(user.getEmail());
 		User usrWithUsername = userRepo.findByUsername(user.getUsername());
 
+		// if returned null there is no user exists already
 		if (usrWithEmail == null && usrWithUsername == null) {
-
 			userRepo.save(user);
 
+			// send email with token
 			String token = generateVerficationToken(user);
 
 			Mail mail = new Mail();
-			mail.setMailFrom("kailasdjtest@gmail.com");
+
+			mail.setMailFrom("spring.navigate@gmail.com");
 			mail.setMailTo(user.getEmail());
-			mail.setMailSubject("Spring Boot - Email Service");
-			mail.setMailContent("Learn how to send email using Spring Boot!");
+			mail.setMailSubject("Verify email");
+			mail.setMailContent("Activate the account by clicking this link below.");
+
 			try {
 				mailService.sendMail(mail, token);
-			} catch (MessagingException e) {
-
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
 		} else
 			throw new RuntimeException("User with given email or username already exists.");
-	}
-
-	private String generateVerficationToken(User user) {
-		String token = UUID.randomUUID().toString();
-		VerificationToken verificationToken = new VerificationToken();
-		verificationToken.setToken(token);
-		verificationToken.setUser(user);
-		verificationToken.setExpiryDate(Instant.now());
-
-		verificationTokenRepository.save(verificationToken);
-		return token;
-
 	}
 
 	@Override
@@ -108,17 +98,30 @@ public class UserServiceImpl implements UserService {
 		String email = user.getEmail();
 		String password = user.getPassword();
 
-		if (userRepo.findByUsername(uname).isEnabled()) {
+		if ((userRepo.findByUsername(uname) != null && userRepo.findByPassword(password) != null)
+				|| (userRepo.findByPassword(password) != null && userRepo.findByEmail(email) != null)) {
 
-			if ((userRepo.findByUsername(uname) != null && userRepo.findByPassword(password) != null)
-					|| (userRepo.findByPassword(password) != null && userRepo.findByEmail(email) != null)) {
-
-				return true;
-			}
-
+			return true;
 		}
 
 		return false;
+
+	}
+
+	private String generateVerficationToken(User user) {
+		String token = UUID.randomUUID().toString();
+		VerificationToken verificationToken = new VerificationToken();
+		verificationToken.setToken(token);
+		verificationToken.setUser(user);
+
+		Calendar currentDate = Calendar.getInstance();
+
+		currentDate.add(Calendar.DATE, 1);
+
+		verificationToken.setExpiryDate(currentDate.getTime());
+
+		verificationTokenRepository.save(verificationToken);
+		return token;
 
 	}
 
@@ -126,11 +129,22 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public void verifyAccount(String token) {
 
-		Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
+		VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
 
-		verificationToken.orElseThrow();
+		VerificationToken vToken = getVerificationToken(token);
 
-		fetchUserandEnable(verificationToken.get());
+		Calendar currentDate = Calendar.getInstance();
+
+		if ((vToken.getExpiryDate().getTime() - currentDate.getTime().getTime()) <= 0) {
+
+			deleteExpiredTokenDetails(verificationToken);
+
+			throw new RuntimeException("Token has expired");
+
+		}
+
+		else
+			fetchUserandEnable(verificationToken);
 
 	}
 
@@ -144,6 +158,20 @@ public class UserServiceImpl implements UserService {
 
 		userRepo.save(user);
 
+		verificationTokenRepository.deleteByUser(user);
+
 	}
 
+	private void deleteExpiredTokenDetails(VerificationToken verificationToken) {
+
+		int id = verificationToken.getUser().getId();
+
+		userRepo.deleteById(id);
+
+	}
+
+	@Override
+	public VerificationToken getVerificationToken(String VerificationToken) {
+		return verificationTokenRepository.findByToken(VerificationToken);
+	}
 }

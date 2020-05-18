@@ -21,7 +21,7 @@ public class MailServiceImpl implements MailService {
 
 	@Override
 	@Async
-	public void sendMail(Mail mail, String Token) throws MessagingException {
+	public void sendMail(Mail mail,String token) throws MessagingException {
 
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -30,14 +30,22 @@ public class MailServiceImpl implements MailService {
 			mimeMessageHelper.setText(mail.getMailContent());
 			mimeMessageHelper.setFrom(mail.getMailFrom());
 			mimeMessageHelper.setTo(mail.getMailTo());
+			
 
 			String name = mail.getMailTo().split("@")[0];
 
+//			mimeMessage.setContent("<html>" + "<head>" + "<h1>Hello&nbsp;" + name + "</h1>" + "</head>" + "<body>"
+//					+ "<p>" + "Please click the button below" + "or use the following url to activate account."  + "</p>"
+//					+  "<a href='http://localhost:8080/email-verified?token="+ UUID.randomUUID() +"'" +">"+ "Activate </a>"  + "<p>" + "With Regards" + "<br>"
+//					+ "Hamro Spring boot." + "</p>" + "</body>" + "</html>" + mail.getMailTo(), "text/html");
+
+			
 			mimeMessage.setContent("<html>" + "<head>" + "<h1>Hello&nbsp;" + name + "</h1>" + "</head>" + "<body>"
-					+ "<p>" + "Please click the button below" + "or use the following url to activate account." + "</p>"
-					+ "<a href='http://localhost:8080/users/emailverification/" + Token + "'" + ">" + "Activate </a>"
-					+ "<p>" + "With Regards" + "<br>" + "Hamro Spring boot." + "</p>" + "</body>" + "</html>"
-					+ mail.getMailTo(), "text/html");
+					+ "<p>" + "Please click the button below" + "or use the following url to activate account."  + "</p>"
+					+  "<a href='http://localhost:8080/users/emailverification/"+ token +"'" +">"+ "Activate Account </a>"  + "<p>" + "With Regards" + "<br>"
+					+ "Hamro Spring boot." + "</p>" + "</body>" + "</html>" + mail.getMailTo(), "text/html");
+
+			
 
 			javaMailSender.send(mimeMessage);
 		} catch (MessagingException e) {

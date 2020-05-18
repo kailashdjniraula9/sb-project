@@ -6,13 +6,14 @@ import io.badri.app.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-	public User findByUsername(String username); //null obj
-	
+	public User findByUsername(String username);
+
 	public User findByEmail(String email);
-	
+
 	public User findByPassword(String password);
-	
+
 	public User findById(int id);
-	
+
+	public User deleteByUsername(String username);
 
 }
